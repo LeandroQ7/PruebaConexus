@@ -1,0 +1,58 @@
+﻿<script type="text/javascript">
+
+    function GetFriendsList(id) {
+        var friendsList = "Amigos: ";
+        var arrayPerson = @Html.Raw(Json.Encode(@ViewBag.personList));
+
+        for (var key in arrayPerson)
+        {
+            // skip loop if the property is from prototype
+            if (!arrayPerson.hasOwnProperty(key)) continue;
+
+            var person = arrayPerson[key];
+            if (person["_id"] == id)
+            {
+                for (var key in person["friends"])
+                {
+                    var friends = person["friends"][key];
+                    friendsList = friendsList + friends["name"] + " - ";
+                }
+                break;
+            }
+
+        }
+        alert(friendsList);
+        return true;
+    }
+
+</script>
+
+
+@{
+    ViewBag.Title = "Home Page";
+}
+
+@{
+    var grid = new WebGrid(ViewBag.personList);
+}
+
+<h4>Lista de personas</h4>
+
+
+    @grid.GetHtml(
+
+    tableStyle: "webgrid-style",
+ 
+    columns: new[] {
+            grid.Column(header: "Nombre",format: (item) => item.name, canSort:true),
+            grid.Column(header: "Genero",format: (item) => item.gender),
+            grid.Column(header: "Edad",format: (item) => item.age),
+            grid.Column(header: "Empresa",format: (item) => item.company),
+            grid.Column(header: "Correo",format: (item) => item.email),
+            grid.Column(header: "Telefono",format: (item) => item.phone),
+            grid.Column(header: "Dirreccion",format: (item) => item.address),
+            grid.Column(header: "Amigos", format: (item) =>Html.ActionLink("Ver Detalles", "", "", null,
+            new { onclick="return GetFriendsList('"+item._id+"')" })),
+
+    }
+    )
